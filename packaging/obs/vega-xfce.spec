@@ -1,4 +1,5 @@
-# Empacotamento para o openSUSE Build Service (home:rodrigosbrito:vega).
+# Empacotamento do vega-xfce para o openSUSE Build Service
+# (home:rodrigosbrito:vega), separado do pacote vega-gtk.
 # Cópia de packaging/opensuse/vega.spec adaptada só no Source0/%setup pra
 # bater com o tarball que o _service (tar_scm) deste mesmo diretório
 # gera — nome com sufixo de versão e diretório interno próprio, ao invés

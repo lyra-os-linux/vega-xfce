@@ -1,9 +1,9 @@
 <services>
   <!-- Fonte de verdade pro build no OBS (home:rodrigosbrito:vega), pacote
-       vega-gtk. Antes da quebra do monorepo em repositórios próprios, este
+       vega-xfce. Antes da quebra do monorepo em repositórios próprios, este
        mesmo _service era compartilhado por vega-gtk/vegad/vega-cli — agora
        cada um desses componentes tem seu próprio repositório e _service;
-       este aqui cobre só o que ainda mora neste repo (vega-gtk).
+       este aqui cobre somente o fork XFCE.
 
        Os serviços ficam ativos para que /trigger/runservice atualize os
        fontes após cada tag. A cadeia usa diretamente o .tar do tar_scm. -->
