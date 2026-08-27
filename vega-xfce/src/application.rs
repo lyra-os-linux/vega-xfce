@@ -87,9 +87,9 @@ fn build_window(app: &adw::Application, show_updates: bool) -> (VegaShell, adw::
 
     let window = adw::ApplicationWindow::builder()
         .application(app)
-        .title(&identity.name)
-        .default_width(1280)
-        .default_height(800)
+        .title(&format!("{} — XFCE", identity.name))
+        .default_width(1180)
+        .default_height(760)
         .content(&shell.root)
         .build();
     window.set_icon_name(Some("vega"));

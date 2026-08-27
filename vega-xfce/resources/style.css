@@ -5,8 +5,9 @@
 @define-color lyra_border alpha(@window_fg_color, 0.14);
 @define-color lyra_text @window_fg_color;
 @define-color lyra_muted alpha(@window_fg_color, 0.72);
-@define-color lyra_blue #5b8cff;
-@define-color lyra_violet #9b6bff;
+@define-color lyra_blue #2777c7;
+@define-color lyra_blue_hover #3589d6;
+@define-color lyra_violet #5c9bd5;
 @define-color lyra_danger #ff5b6e;
 @define-color lyra_warning #ffb84d;
 @define-color lyra_success #4dd68c;
@@ -17,35 +18,48 @@
 }
 
 .window-chrome {
-  min-height: 42px;
-  background-color: alpha(@lyra_night_alt, 0.96);
+  min-height: 36px;
+  background-color: @lyra_night_alt;
   border-bottom: 1px solid @lyra_border;
+  box-shadow: none;
 }
 
 .vega-sidebar {
-  min-width: 240px;
+  min-width: 226px;
   background-color: @lyra_night_alt;
   border-right: 1px solid @lyra_border;
-  padding: 16px 8px;
+  padding: 10px 7px 8px;
 }
 
 .sidebar-brand {
-  padding: 8px 12px 20px 12px;
-  font-size: 18px;
+  padding: 6px 9px 13px;
+}
+
+.brand-title {
+  font-size: 17px;
   font-weight: 700;
 }
 
+.brand-edition {
+  color: @lyra_muted;
+  font-size: 10px;
+  font-weight: 600;
+}
+
 .brand-mark {
-  min-width: 20px;
-  min-height: 20px;
-  border-radius: 6px;
-  background-image: linear-gradient(135deg, @lyra_blue, @lyra_violet);
-  color: transparent;
+  min-width: 27px;
+  min-height: 27px;
+  border-radius: 4px;
+  background-image: linear-gradient(145deg, @lyra_blue_hover, @lyra_blue);
+  color: white;
+  font-size: 15px;
+  font-weight: 800;
+  box-shadow: inset 0 0 0 1px alpha(white, 0.18);
 }
 
 .sidebar-search {
-  margin: 0 4px 14px 4px;
-  border-radius: 8px;
+  margin: 0 3px 10px;
+  border-radius: 4px;
   background-color: @lyra_surface;
   border: 1px solid @lyra_border;
 }
@@ -67,10 +81,10 @@
 }
 
 button.sidebar-item {
-  min-height: 38px;
+  min-height: 32px;
   margin: 1px 0;
-  padding: 0 12px;
-  border-radius: 8px;
+  padding: 0 9px;
+  border-radius: 4px;
   color: @lyra_muted;
 }
 
@@ -86,14 +100,15 @@ button.sidebar-item:hover {
 }
 
 button.sidebar-item:checked {
-  background-color: @lyra_surface_raised;
-  color: @lyra_text;
+  background-color: @lyra_blue;
+  color: white;
   font-weight: 600;
+  box-shadow: inset 3px 0 alpha(white, 0.65);
 }
 
 .content-page {
   background-color: @lyra_night;
-  padding: 28px 36px;
+  padding: 22px 28px;
 }
 
 .content-page.compact-page {
@@ -121,8 +136,9 @@ button.sidebar-item:checked {
 .card {
   background-color: @lyra_surface;
   border: 1px solid @lyra_border;
-  border-radius: 12px;
+  border-radius: 5px;
   padding: 8px;
+  box-shadow: 0 1px 2px alpha(black, 0.08);
 }
 
 button.dashboard-card {
@@ -141,7 +157,7 @@ button.dashboard-card:hover {
 
 .module-tabs {
   padding: 3px;
-  border-radius: 8px;
+  border-radius: 4px;
   border: 1px solid @lyra_border;
   background-color: @lyra_surface;
 }
@@ -149,13 +165,13 @@ button.dashboard-card:hover {
 button.module-tab {
   min-height: 34px;
   padding: 0 12px;
-  border-radius: 6px;
+  border-radius: 3px;
   color: @lyra_muted;
 }
 
 button.module-tab:checked {
-  background-color: @lyra_surface_raised;
-  color: @lyra_text;
+  background-color: @lyra_blue;
+  color: white;
   font-weight: 600;
 }
 
@@ -201,7 +217,7 @@ button.view-switch:checked {
   padding: 12px;
   background-color: @lyra_surface;
   border: 1px solid @lyra_border;
-  border-radius: 12px;
+  border-radius: 5px;
 }
 
 .software-card .title-3 {
@@ -239,7 +255,7 @@ textview.transaction-console text selection {
 .package-icon {
   background-color: @lyra_surface_raised;
   border: 1px solid @lyra_border;
-  border-radius: 8px;
+  border-radius: 4px;
 }
 
 .package-icon-fallback {
@@ -258,7 +274,7 @@ textview.transaction-console text selection {
 .storage-volumes row:selected,
 .services-list row:selected {
   background-color: alpha(@lyra_blue, 0.24);
-  box-shadow: inset 3px 0 @lyra_violet;
+  box-shadow: inset 3px 0 @lyra_blue;
 }
 
 .firewall-services row:selected label,
@@ -276,7 +292,35 @@ textview.transaction-console text selection {
 
 .software-cards flowboxchild:selected .software-card {
   background-color: alpha(@lyra_blue, 0.24);
-  box-shadow: inset 3px 0 @lyra_violet;
+  box-shadow: inset 3px 0 @lyra_blue;
+}
+
+/* A edição XFCE segue o desenho de aplicativos de desktop: controles mais
+ * compactos, foco bem delimitado e pouca elevação entre superfícies. */
+button:not(.suggested-action):not(.destructive-action),
+entry,
+dropdown,
+spinbutton {
+  border-radius: 4px;
+}
+
+preferencesgroup > box > box {
+  border-radius: 5px;
+}
+
+switch slider {
+  border-radius: 3px;
+}
+
+switch {
+  border-radius: 4px;
+}
+
+button:focus-visible,
+entry:focus-within,
+dropdown:focus-visible {
+  outline-color: @lyra_blue;
+  outline-width: 2px;
 }
 
 .software-cards flowboxchild:selected .software-card label {

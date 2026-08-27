@@ -163,12 +163,21 @@ impl VegaShell {
             Some("hardware"),
             &gettext("Hardware e Kernel"),
         );
-        let brand = gtk::Box::new(gtk::Orientation::Horizontal, 10);
+        let brand = gtk::Box::new(gtk::Orientation::Horizontal, 9);
         brand.add_css_class("sidebar-brand");
-        let mark = gtk::Label::new(Some(" "));
+        let mark = gtk::Label::new(Some("V"));
         mark.add_css_class("brand-mark");
         brand.append(&mark);
-        brand.append(&gtk::Label::new(Some("Vega")));
+        let brand_text = gtk::Box::new(gtk::Orientation::Vertical, 0);
+        let brand_title = gtk::Label::new(Some("Vega"));
+        brand_title.set_xalign(0.0);
+        brand_title.add_css_class("brand-title");
+        let brand_edition = gtk::Label::new(Some("LYRA XFCE"));
+        brand_edition.set_xalign(0.0);
+        brand_edition.add_css_class("brand-edition");
+        brand_text.append(&brand_title);
+        brand_text.append(&brand_edition);
+        brand.append(&brand_text);
         let sidebar_search = gtk::SearchEntry::builder()
             .placeholder_text(gettext("Buscar configuração…"))
             .build();
@@ -289,11 +298,11 @@ impl VegaShell {
             .end_child(&stack)
             .resize_start_child(false)
             .shrink_start_child(false)
-            .position(240)
+            .position(226)
             .vexpand(true)
             .build();
 
-        let title = adw::WindowTitle::new("Vega", "");
+        let title = adw::WindowTitle::new("Vega", &gettext("Central de Controle XFCE"));
         let header = adw::HeaderBar::builder().title_widget(&title).build();
         header.add_css_class("window-chrome");
         header.pack_end(&app_menu(&stack, preferences));
@@ -371,12 +380,12 @@ fn app_menu(
     let about_stack = stack.clone();
     about.connect_activate(move |_, _| {
         let dialog = adw::AboutDialog::builder()
-            .application_name("Vega")
+            .application_name("Vega XFCE")
             .application_icon("vega")
             .developer_name("Lyra OS")
             .version(crate::model::APPLICATION_VERSION)
-            .website("https://github.com/lyra-os-linux/vega")
-            .issue_url("https://github.com/lyra-os-linux/vega/issues")
+            .website("https://github.com/lyra-os-linux/vega-xfce")
+            .issue_url("https://github.com/lyra-os-linux/vega-xfce/issues")
             .license_type(gtk::License::Gpl30)
             .build();
         dialog.set_developers(&["Rodrigo Brito"]);
