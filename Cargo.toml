@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["vega-gtk"]
+members = ["vega-xfce"]
 
 [workspace.package]
 version = "5.1.26"
@@ -8,7 +8,7 @@ edition = "2024"
 license = "GPL-3.0"
 authors = ["Rodrigo Brito"]
 rust-version = "1.92"
-homepage = "https://github.com/lyra-os-linux/vega"
+homepage = "https://github.com/lyra-os-linux/vega-xfce"
 
 [profile.release]
 lto = "thin"

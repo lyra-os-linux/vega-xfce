@@ -1,16 +1,15 @@
 # Vega — Control Center
 
 > [!WARNING]
-> Este fork prepara o Vega do flavor XFCE experimental. Ele preserva por
-> enquanto a implementação GTK original e não constitui uma edição suportada
-> ou um pacote publicável. A integração com XFCE será desenvolvida somente
-> depois que a imagem básica do flavor estiver validada.
+> Este é o fork experimental do Vega para o flavor XFCE. Ele compartilha o
+> daemon e o contrato D-Bus do Vega e mantém GTK4/libadwaita como base visual
+> durante a migração.
 
 *[Leia em português](README.pt-br.md)*
 
-Vega is a native control center built exclusively for openSUSE. It brings
+Vega XFCE is a native control center built exclusively for openSUSE. It brings
 software, hardware, kernel, network, backup, user, and service administration
-into a single interface integrated with GNOME. It complements GNOME Settings
+into a single interface integrated with XFCE. It complements XFCE Settings
 with administration tasks that would otherwise require separate tools such as
 `zypper`, `nmcli`, `systemctl`, and configuration-file editors.
 
@@ -18,7 +17,7 @@ The project provides a graphical interface built with Rust and
 GTK4/libadwaita, plus a terminal interface built with Bash and `dialog`. Both
 use the same privileged daemon and D-Bus contract.
 
-Licensed under GPL-3.0. This repository hosts `vega-gtk` and the
+Licensed under GPL-3.0. This repository hosts `vega-xfce` and the
 product-wide docs/scripts; the other components each have their own
 repository — see [Architecture](#architecture) below.
 
@@ -40,12 +39,12 @@ dependency is missing without preventing the other pages from working.
 
 Vega is split across several repositories under
 [lyra-os-linux](https://github.com/lyra-os-linux). This repository
-(`vega`) hosts `vega-gtk` plus the docs/scripts that span the whole
+(`vega-xfce`) hosts `vega-xfce` plus the docs/scripts that span the whole
 product; each other component has its own repository and release cycle:
 
 | Component | Technology | Role | Repository |
 | --- | --- | --- | --- |
-| `vega-gtk` | Rust, GTK4, and libadwaita | Unprivileged graphical interface | this repo |
+| `vega-xfce` | Rust, GTK4, and libadwaita | Unprivileged XFCE graphical interface | this repo |
 | `vega-cli` | Bash and `dialog` | Terminal interface for local or SSH use | [lyra-os-linux/vega-cli](https://github.com/lyra-os-linux/vega-cli) |
 | `vega-web` | Rust, axum | HTTPS panel for LAN-only administration | [lyra-os-linux/vega-web](https://github.com/lyra-os-linux/vega-web) |
 | `vegad` | Go | Daemon that performs authorized system operations | [lyra-os-linux/vegad](https://github.com/lyra-os-linux/vegad) |
@@ -90,7 +89,7 @@ sudo zypper --gpg-auto-import-keys refresh vega-obs
 Install the graphical interface, daemon, and terminal interface:
 
 ```sh
-sudo zypper install vega-gtk vegad vega-cli
+sudo zypper install vega-xfce vegad
 ```
 
 `vegad` is activated automatically over D-Bus when an interface needs it; it
@@ -119,7 +118,7 @@ sudo zypper install vegad vega-cli
 ```
 
 After installation, open the graphical interface from the application menu or
-run `vega-gtk`. Run `vega` to start the terminal interface.
+run `vega-xfce`.
 
 ### Release RPMs
 
@@ -136,7 +135,7 @@ as unsigned packages.
 sudo bash scripts/uninstall.sh
 ```
 
-The script removes any installed `vega-gtk`, `vegad`, and `vega-cli` packages.
+The script removes any installed Vega packages listed by that installer.
 Set `VEGA_PURGE=1` to also delete backup configuration under `/etc/vega` and
 exported logs under `/var/log/vega`.
 
@@ -165,11 +164,11 @@ see [lyra-os-linux/vegad](https://github.com/lyra-os-linux/vegad).
 Run the graphical interface during development:
 
 ```sh
-cargo run --manifest-path vega-gtk/Cargo.toml
+cargo run --manifest-path vega-xfce/Cargo.toml --bin vega-xfce
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines,
-[vega-gtk/README.md](vega-gtk/README.md) for interface details, and
+[vega-xfce/README.md](vega-xfce/README.md) for interface details, and
 [lyra-vega-dbus](https://github.com/lyra-os-linux/lyra-vega-dbus) for the
 D-Bus contract.
 

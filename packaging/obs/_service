@@ -9,7 +9,7 @@
        fontes após cada tag. A cadeia usa diretamente o .tar do tar_scm. -->
   <service name="tar_scm">
     <param name="scm">git</param>
-    <param name="url">https://github.com/lyra-os-linux/vega.git</param>
+    <param name="url">https://github.com/lyra-os-linux/vega-xfce.git</param>
     <!-- master não existe neste repo (o branch padrão é main) — sem
          "revision" o tar_scm tenta master por default e falha com
          "master: No such revision". match-tag procura a tag mais nova
@@ -26,7 +26,7 @@
     <!-- Sem histórico do git nem artefatos de build do Rust no tarball de
          fontes, igual ao empacotamento local. -->
     <param name="exclude">.git</param>
-    <param name="exclude">vega-gtk/target</param>
+    <param name="exclude">vega-xfce/target</param>
     <param name="filename">vega-src</param>
   </service>
   <!-- O .tar versionado é consumido diretamente. recompress não aceita glob

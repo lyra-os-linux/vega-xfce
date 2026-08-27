@@ -5,7 +5,7 @@ import unittest
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-PO_DIR = ROOT / "vega-gtk" / "po"
+PO_DIR = ROOT / "vega-xfce" / "po"
 LOCALES = ("en-US", "pt-BR", "es-ES")
 PLACEHOLDER = re.compile(r"\{[A-Za-z_][A-Za-z0-9_]*\}")
 
@@ -62,7 +62,7 @@ class VegaGtkI18nTests(unittest.TestCase):
                         self.assertIn(token, value, f"{locale}: {key}")
 
     def test_rpm_specs_install_all_catalogs(self):
-        for relative in ("packaging/opensuse/vega.spec", "packaging/obs/vega-gtk.spec"):
+        for relative in ("packaging/opensuse/vega.spec", "packaging/obs/vega-xfce.spec"):
             spec = (ROOT / relative).read_text(encoding="utf-8")
             for locale in ("en_US", "pt_BR", "es_ES"):
                 self.assertIn(locale, spec)

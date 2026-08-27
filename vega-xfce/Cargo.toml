@@ -1,12 +1,16 @@
 [package]
-name = "vega-gtk"
+name = "vega-xfce"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 authors.workspace = true
 rust-version.workspace = true
 homepage.workspace = true
-description = "Interface nativa GTK4 do centro de controle Vega"
+description = "Interface GTK4 do centro de controle Vega para XFCE"
+
+[[bin]]
+name = "vega-xfce"
+path = "src/main.rs"
 
 [dependencies]
 gtk = { package = "gtk4", version = "0.11.4", features = ["v4_10"] }

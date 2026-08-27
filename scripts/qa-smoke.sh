@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Smoke test local do vega-gtk. Desde a quebra do monorepo, vegad tem seu
+# Smoke test local do vega-xfce. Desde a quebra do monorepo, vegad tem seu
 # próprio smoke test (Go) no repositório dele; este cobre só o que ainda
 # mora aqui.
 set -euo pipefail
@@ -7,10 +7,10 @@ set -euo pipefail
 repo_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 
 echo "[1/5] Rust formatting, tests and lints"
-(cd "$repo_root/vega-gtk" && cargo fmt --check && cargo test --locked && cargo clippy --locked -- -D warnings)
+(cd "$repo_root/vega-xfce" && cargo fmt --check && cargo test --locked && cargo clippy --locked -- -D warnings)
 
 echo "[2/5] Optimized GTK build"
-(cd "$repo_root/vega-gtk" && cargo build --release --locked)
+(cd "$repo_root/vega-xfce" && cargo build --release --locked)
 
 echo "[3/5] Packaging metadata"
 bash -n "$repo_root/scripts/install.sh"
@@ -27,7 +27,7 @@ if grep -Ei '(electron|node_modules|npm (ci|install|run)|nodejs)' "${package_fil
 fi
 # O empacotamento openSUSE usa o rust/cargo fornecido pelo próprio zypper.
 
-echo "[5/5] Identidade GTK"
-grep -q 'vega-gtk' "$repo_root/vega-gtk/Cargo.toml"
+echo "[5/5] Identidade XFCE"
+grep -q 'vega-xfce' "$repo_root/vega-xfce/Cargo.toml"
 
 echo "Smoke local concluído"

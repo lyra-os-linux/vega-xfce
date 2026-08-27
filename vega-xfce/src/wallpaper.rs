@@ -3,12 +3,14 @@ use std::{
     fs,
     io::{BufReader, Read},
     path::{Path, PathBuf},
+    process::Command,
 };
 
 use crate::i18n::gettext;
 use gtk::{gio, gio::prelude::*, glib};
 
 const SCHEMA_ID: &str = "org.gnome.desktop.background";
+const XFCE_CHANNEL: &str = "xfce4-desktop";
 const CATALOG_DIRS: &[&str] = &[
     "/usr/share/gnome-background-properties",
     "/usr/local/share/gnome-background-properties",
@@ -33,11 +35,13 @@ impl std::fmt::Display for WallpaperError {
 
 impl std::error::Error for WallpaperError {}
 
-/// GNOME guarda o papel de parede como preferência da sessão do usuário
-/// (dconf), não como configuração de sistema — por isso essa funcionalidade
-/// não passa pelo vegad, ao contrário do resto do Vega. Um daemon root não
-/// tem uma forma robusta de escrever na sessão dconf de um usuário logado.
+/// O wallpaper pertence à sessão do usuário e não passa pelo vegad. No XFCE,
+/// o xfdesktop publica essa configuração no canal `xfce4-desktop`; o backend
+/// GNOME é mantido como fallback para desenvolvimento e sessões compatíveis.
 pub fn schema_available() -> bool {
+    if is_xfce_session() {
+        return xfconf_properties().is_ok();
+    }
     gio::SettingsSchemaSource::default()
         .is_some_and(|source| source.lookup(SCHEMA_ID, true).is_some())
 }
@@ -299,6 +303,12 @@ pub fn thumbnail_to_pixbuf(data: &ThumbnailData) -> gtk::gdk_pixbuf::Pixbuf {
 }
 
 pub fn current_light_path() -> Option<PathBuf> {
+    if is_xfce_session() {
+        return xfce_image_properties()
+            .ok()?
+            .into_iter()
+            .find_map(|property| xfconf_get(&property));
+    }
     if !schema_available() {
         return None;
     }
@@ -308,6 +318,9 @@ pub fn current_light_path() -> Option<PathBuf> {
 }
 
 pub fn apply(entry: &WallpaperEntry) -> Result<(), WallpaperError> {
+    if is_xfce_session() {
+        return apply_xfce(&entry.light_path);
+    }
     if !schema_available() {
         return Err(WallpaperError(gettext(
             "O esquema org.gnome.desktop.background não está disponível neste sistema.",
@@ -325,6 +338,92 @@ pub fn apply(entry: &WallpaperEntry) -> Result<(), WallpaperError> {
         .map_err(|_| WallpaperError(gettext("Não foi possível aplicar o papel de parede.")))?;
     let _ = settings.set_string("picture-uri-dark", &dark_uri);
     let _ = settings.set_string("picture-options", "zoom");
+    Ok(())
+}
+
+fn is_xfce_session() -> bool {
+    std::env::var("XDG_CURRENT_DESKTOP")
+        .ok()
+        .is_some_and(|desktop| {
+            desktop
+                .split(':')
+                .any(|part| part.eq_ignore_ascii_case("xfce"))
+        })
+}
+
+fn xfconf_properties() -> Result<Vec<String>, WallpaperError> {
+    let output = Command::new("xfconf-query")
+        .args(["-c", XFCE_CHANNEL, "-l"])
+        .output()
+        .map_err(|error| WallpaperError(format!("xfconf-query: {error}")))?;
+    if !output.status.success() {
+        return Err(WallpaperError(gettext(
+            "Não foi possível acessar as configurações do desktop XFCE.",
+        )));
+    }
+    Ok(parse_xfconf_properties(&String::from_utf8_lossy(
+        &output.stdout,
+    )))
+}
+
+fn parse_xfconf_properties(output: &str) -> Vec<String> {
+    output
+        .lines()
+        .map(str::trim)
+        .filter(|property| {
+            property.starts_with("/backdrop/")
+                && (property.ends_with("/last-image") || property.ends_with("/image-path"))
+        })
+        .map(str::to_owned)
+        .collect()
+}
+
+fn xfce_image_properties() -> Result<Vec<String>, WallpaperError> {
+    let properties = xfconf_properties()?
+        .into_iter()
+        .filter(|property| property.ends_with("/last-image"))
+        .collect::<Vec<_>>();
+    if properties.is_empty() {
+        // XFCE antigo usava `image-path` em vez de `last-image`.
+        return Ok(xfconf_properties()?
+            .into_iter()
+            .filter(|property| property.ends_with("/image-path"))
+            .collect());
+    }
+    Ok(properties)
+}
+
+fn xfconf_get(property: &str) -> Option<PathBuf> {
+    let output = Command::new("xfconf-query")
+        .args(["-c", XFCE_CHANNEL, "-p", property])
+        .output()
+        .ok()?;
+    output
+        .status
+        .success()
+        .then(|| PathBuf::from(String::from_utf8_lossy(&output.stdout).trim()))
+        .filter(|path| !path.as_os_str().is_empty())
+}
+
+fn apply_xfce(path: &Path) -> Result<(), WallpaperError> {
+    let properties = xfce_image_properties()?;
+    if properties.is_empty() {
+        return Err(WallpaperError(gettext(
+            "O XFCE ainda não possui uma configuração de wallpaper para este monitor.",
+        )));
+    }
+    for property in properties {
+        let status = Command::new("xfconf-query")
+            .args(["-c", XFCE_CHANNEL, "-p", &property, "-s"])
+            .arg(path)
+            .status()
+            .map_err(|error| WallpaperError(format!("xfconf-query: {error}")))?;
+        if !status.success() {
+            return Err(WallpaperError(gettext(
+                "Não foi possível aplicar o papel de parede no XFCE.",
+            )));
+        }
+    }
     Ok(())
 }
 
@@ -440,6 +539,23 @@ fn display_name_from_path(path: &Path) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn finds_current_and_legacy_xfce_wallpaper_properties() {
+        let output = r#"
+/backdrop/screen0/monitorDP-1/workspace0/last-image
+/backdrop/screen0/monitorDP-1/workspace0/image-style
+/backdrop/screen0/monitor0/image-path
+/desktop-icons/style
+"#;
+        assert_eq!(
+            parse_xfconf_properties(output),
+            vec![
+                "/backdrop/screen0/monitorDP-1/workspace0/last-image",
+                "/backdrop/screen0/monitor0/image-path",
+            ]
+        );
+    }
 
     #[test]
     fn parses_a_wallpaper_catalog_entry_with_existing_files() {

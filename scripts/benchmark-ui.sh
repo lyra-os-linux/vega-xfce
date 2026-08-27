@@ -5,11 +5,11 @@ repo_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 samples="${1:-10}"
 settle_seconds="${VEGA_BENCHMARK_SETTLE_SECONDS:-5}"
 output="${VEGA_BENCHMARK_OUTPUT:-$repo_root/docs/migration/rust-gtk-benchmark.csv}"
-binary="$repo_root/vega-gtk/target/release/vega-gtk"
+binary="$repo_root/target/release/vega-xfce"
 cargo_bin="${CARGO:-cargo}"
 
 [[ "$samples" =~ ^[1-9][0-9]*$ ]] || { echo "Amostras deve ser inteiro positivo" >&2; exit 2; }
-(cd "$repo_root/vega-gtk" && "$cargo_bin" build --release --locked)
+(cd "$repo_root/vega-xfce" && "$cargo_bin" build --release --locked)
 
 printf 'sample,startup_ms,pss_kib,processes,cpu_percent,binary_bytes\n' >"$output"
 for ((sample = 1; sample <= samples; sample++)); do

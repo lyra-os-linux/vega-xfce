@@ -2028,7 +2028,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "vega-gtk"
+name = "vega-xfce"
 version = "5.1.26"
 dependencies = [
  "base64",

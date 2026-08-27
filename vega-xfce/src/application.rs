@@ -16,7 +16,7 @@ use lyra_vega_dbus::{
     StorageClient, SystemClient, UsersClient, VegaDbus,
 };
 
-pub const APPLICATION_ID: &str = "org.lyraos.Vega";
+pub const APPLICATION_ID: &str = "org.lyraos.Vega.Xfce";
 
 thread_local! {
     static LAST_STRUGGLING_SERVICES: Cell<Option<usize>> = const { Cell::new(None) };

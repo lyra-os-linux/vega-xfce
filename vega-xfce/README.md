@@ -1,8 +1,8 @@
-# Vega GTK
+# Vega XFCE
 
-Interface oficial do Vega, implementada em Rust, GTK4 e libadwaita. O `vegad`
+Interface experimental do Vega para XFCE, implementada em Rust, GTK4 e libadwaita. O `vegad`
 e o contrato em `../dbus/` formam a fronteira privilegiada do aplicativo. O
-pacote e o binário usam o nome `vega-gtk`.
+pacote e o binário usam o nome `vega-xfce`.
 
 ## Dependências no openSUSE Leap
 
@@ -16,12 +16,12 @@ manifest é Rust 1.92, exigido pela geração atual de bindings.
 ## Desenvolvimento
 
 ```bash
-cargo run --manifest-path vega-gtk/Cargo.toml
-cargo test --manifest-path vega-gtk/Cargo.toml
-cargo clippy --manifest-path vega-gtk/Cargo.toml --all-targets -- -D warnings
+cargo run --manifest-path vega-xfce/Cargo.toml
+cargo test --manifest-path vega-xfce/Cargo.toml
+cargo clippy --manifest-path vega-xfce/Cargo.toml --all-targets -- -D warnings
 ```
 
-O application ID oficial é `org.lyraos.Vega`.
+O application ID é `org.lyraos.Vega.Xfce`.
 
 ## D-Bus
 
@@ -49,7 +49,7 @@ suportados usam inglês americano.
 sem instalar o pacote:
 
 ```bash
-LANG=en_US.UTF-8 cargo run --manifest-path vega-gtk/Cargo.toml
+LANG=en_US.UTF-8 cargo run --manifest-path vega-xfce/Cargo.toml
 ```
 
 Atualizar o template depois de mexer nas strings requer `xtr`, que entende
