@@ -1,5 +1,11 @@
 # Vega — Control Center
 
+> [!WARNING]
+> Este fork prepara o Vega do flavor XFCE experimental. Ele preserva por
+> enquanto a implementação GTK original e não constitui uma edição suportada
+> ou um pacote publicável. A integração com XFCE será desenvolvida somente
+> depois que a imagem básica do flavor estiver validada.
+
 *[Leia em português](README.pt-br.md)*
 
 Vega is a native control center built exclusively for openSUSE. It brings
