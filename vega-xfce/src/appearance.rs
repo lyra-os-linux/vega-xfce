@@ -1,61 +1,60 @@
-use gtk::{gio, gio::prelude::*};
+use std::io;
+use std::process::{Command, Stdio};
 
-const SCHEMA: &str = "org.gnome.desktop.interface";
-
-/// Tema claro/escuro do GNOME inteiro (`color-scheme`), o mesmo valor lido
-/// pelo GNOME Shell, Nautilus e qualquer app libadwaita — igual ao painel
-/// Aparência das Configurações do GNOME.
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
-pub enum Theme {
-    #[default]
-    System,
-    Light,
-    Dark,
+/// Módulos fornecidos pelo próprio XFCE. O Vega os organiza em uma central,
+/// mas as preferências continuam sendo persistidas nativamente no xfconf.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Module {
+    Appearance,
+    Windows,
+    Desktop,
+    Panel,
+    Power,
+    Settings,
 }
 
-/// `org.gnome.desktop.interface` é do GNOME, não do vegad — mesma lógica de
-/// schema_available() do wallpaper/screensaver, sem depender do backend.
-pub fn schema_available() -> bool {
-    gio::SettingsSchemaSource::default()
-        .and_then(|source| source.lookup(SCHEMA, true))
-        .is_some()
-}
-
-pub fn current_theme() -> Theme {
-    if !schema_available() {
-        return Theme::default();
-    }
-    match gio::Settings::new(SCHEMA).string("color-scheme").as_str() {
-        "prefer-dark" => Theme::Dark,
-        "prefer-light" => Theme::Light,
-        _ => Theme::System,
+impl Module {
+    fn command(self) -> (&'static str, &'static [&'static str]) {
+        match self {
+            Self::Appearance => ("xfce4-appearance-settings", &[]),
+            Self::Windows => ("xfwm4-settings", &[]),
+            Self::Desktop => ("xfdesktop-settings", &[]),
+            Self::Panel => ("xfce4-panel", &["--preferences"]),
+            Self::Power => ("xfce4-power-manager-settings", &[]),
+            Self::Settings => ("xfce4-settings-manager", &[]),
+        }
     }
 }
 
-pub fn apply_theme(theme: Theme) {
-    if !schema_available() {
-        return;
-    }
-    let value = match theme {
-        Theme::System => "default",
-        Theme::Light => "prefer-light",
-        Theme::Dark => "prefer-dark",
-    };
-    let _ = gio::Settings::new(SCHEMA).set_string("color-scheme", value);
+pub fn open_module(module: Module) -> io::Result<()> {
+    let (program, args) = module.command();
+    Command::new(program)
+        .args(args)
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()
+        .map(|_| ())
 }
 
-/// Tema de ícones padrão da Vega — reaplicado sempre que o usuário troca o
-/// card de tema, pra não ficar com um tema de ícones genérico depois de
-/// mexer só na claridade da interface.
-///
-/// O pacote de ícones se chamava "Lyra-Enterprise-Icons" antes do rename pra
-/// "Lyra OS" (Lyra-Theme@47d0ff4). Mantenha este nome em sincronia com
-/// `Name=` em `Lyra-OS-Icons/index.theme` nesse repositório.
-const ICON_THEME_NAME: &str = "Lyra-OS-Icons";
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-pub fn apply_icon_theme() {
-    if !schema_available() {
-        return;
+    #[test]
+    fn native_modules_have_expected_commands() {
+        assert_eq!(
+            Module::Appearance.command(),
+            ("xfce4-appearance-settings", &[][..])
+        );
+        assert_eq!(Module::Desktop.command(), ("xfdesktop-settings", &[][..]));
+        assert_eq!(
+            Module::Panel.command(),
+            ("xfce4-panel", &["--preferences"][..])
+        );
+        assert_eq!(
+            Module::Power.command(),
+            ("xfce4-power-manager-settings", &[][..])
+        );
     }
-    let _ = gio::Settings::new(SCHEMA).set_string("icon-theme", ICON_THEME_NAME);
 }

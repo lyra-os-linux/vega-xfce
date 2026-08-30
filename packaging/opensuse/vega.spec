@@ -18,6 +18,10 @@ BuildRequires:  gettext-tools
 Requires:       vegad
 Requires:       secret-tool
 Requires:       xfconf
+Requires:       xfce4-settings
+Requires:       xfdesktop
+Requires:       xfce4-panel
+Requires:       xfce4-power-manager
 
 Recommends:     flatpak
 Recommends:     restic
