@@ -9,6 +9,7 @@ type ApplyHandler = Rc<dyn Fn(WallpaperEntry)>;
 
 #[derive(Clone)]
 pub struct WallpaperPage {
+    #[allow(dead_code)]
     pub root: gtk::Widget,
     pub status: gtk::Label,
     pub add: gtk::Button,

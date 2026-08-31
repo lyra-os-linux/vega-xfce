@@ -75,6 +75,7 @@ fn dropdown_selected<'a>(dropdown: &gtk::DropDown, ids: &'a [&str]) -> &'a str {
 
 #[derive(Clone)]
 pub struct DockPage {
+    #[allow(dead_code)]
     pub root: gtk::Widget,
     pub status: gtk::Label,
     pub position: gtk::DropDown,

@@ -5,6 +5,7 @@ use crate::screensaver::ScreensaverSettings;
 
 #[derive(Clone)]
 pub struct ScreensaverPage {
+    #[allow(dead_code)]
     pub root: gtk::Widget,
     pub status: gtk::Label,
     pub lock_enabled: gtk::Switch,

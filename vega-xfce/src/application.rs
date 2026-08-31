@@ -87,7 +87,7 @@ fn build_window(app: &adw::Application, show_updates: bool) -> (VegaShell, adw::
 
     let window = adw::ApplicationWindow::builder()
         .application(app)
-        .title(&format!("{} — XFCE", identity.name))
+        .title(format!("{} — XFCE", identity.name))
         .default_width(1180)
         .default_height(760)
         .content(&shell.root)
