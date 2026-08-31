@@ -9,6 +9,7 @@ pub enum Module {
     Windows,
     Desktop,
     Panel,
+    Screensaver,
     Power,
     Settings,
 }
@@ -20,6 +21,7 @@ impl Module {
             Self::Windows => ("xfwm4-settings", &[]),
             Self::Desktop => ("xfdesktop-settings", &[]),
             Self::Panel => ("xfce4-panel", &["--preferences"]),
+            Self::Screensaver => ("xfce4-screensaver-preferences", &[]),
             Self::Power => ("xfce4-power-manager-settings", &[]),
             Self::Settings => ("xfce4-settings-manager", &[]),
         }
@@ -55,6 +57,10 @@ mod tests {
         assert_eq!(
             Module::Power.command(),
             ("xfce4-power-manager-settings", &[][..])
+        );
+        assert_eq!(
+            Module::Screensaver.command(),
+            ("xfce4-screensaver-preferences", &[][..])
         );
     }
 }

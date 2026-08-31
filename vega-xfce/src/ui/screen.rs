@@ -4,9 +4,9 @@ use adw::prelude::*;
 
 use super::{DockPage, MenuPage, ScreensaverPage, WallpaperPage};
 
-/// Central de personalização da edição XFCE. O papel de parede continua
-/// integrado ao Vega; os cards abrem os configuradores nativos, que são a
-/// fonte de verdade das demais preferências do desktop.
+/// Central de personalização da edição XFCE. Como no Vega Qt, os cards são
+/// atalhos para os configuradores nativos, que permanecem como fonte de
+/// verdade das preferências do desktop.
 #[derive(Clone)]
 pub struct ScreenPage {
     pub root: gtk::Widget,
@@ -24,27 +24,6 @@ impl ScreenPage {
         let wallpaper = WallpaperPage::new();
         let menu = MenuPage::new();
         let dock = DockPage::new();
-
-        let overview = native_page();
-        let overview_tab = tab_button(&gettext("Visão geral"));
-        let wallpaper_tab = tab_button(&gettext("Papel de parede"));
-        overview_tab.set_active(true);
-        wallpaper_tab.set_group(Some(&overview_tab));
-
-        let tabs = gtk::Box::new(gtk::Orientation::Horizontal, 4);
-        tabs.add_css_class("module-tabs");
-        tabs.append(&overview_tab);
-        tabs.append(&wallpaper_tab);
-
-        let stack = gtk::Stack::builder()
-            .transition_type(gtk::StackTransitionType::Crossfade)
-            .vexpand(true)
-            .build();
-        stack.add_named(&overview, Some("overview"));
-        stack.add_named(&wallpaper.root, Some("wallpaper"));
-        stack.set_visible_child_name("overview");
-        connect_tab(&overview_tab, &stack, "overview");
-        connect_tab(&wallpaper_tab, &stack, "wallpaper");
 
         let heading = gtk::Box::new(gtk::Orientation::Vertical, 4);
         heading.append(
@@ -64,9 +43,10 @@ impl ScreenPage {
 
         let content = gtk::Box::new(gtk::Orientation::Vertical, 10);
         content.add_css_class("content-page");
+        content.set_hexpand(true);
+        content.set_vexpand(true);
         content.append(&heading);
-        content.append(&tabs);
-        content.append(&stack);
+        content.append(&native_page());
         Self {
             root: content.upcast(),
             screensaver,
@@ -83,22 +63,6 @@ impl Default for ScreenPage {
     }
 }
 
-fn tab_button(label: &str) -> gtk::ToggleButton {
-    gtk::ToggleButton::builder()
-        .label(label)
-        .css_classes(["flat", "module-tab"])
-        .build()
-}
-
-fn connect_tab(button: &gtk::ToggleButton, stack: &gtk::Stack, page: &'static str) {
-    let stack = stack.clone();
-    button.connect_clicked(move |button| {
-        if button.is_active() {
-            stack.set_visible_child_name(page);
-        }
-    });
-}
-
 fn native_page() -> gtk::Widget {
     let grid = gtk::FlowBox::builder()
         .column_spacing(14)
@@ -107,19 +71,21 @@ fn native_page() -> gtk::Widget {
         .max_children_per_line(2)
         .selection_mode(gtk::SelectionMode::None)
         .homogeneous(true)
+        .hexpand(true)
+        .halign(gtk::Align::Fill)
         .valign(gtk::Align::Start)
         .build();
     for (title, description, icon, module) in [
         (
             "Aparência",
             "Tema, cores, ícones, fontes e cursor",
-            "preferences-desktop-theme-symbolic",
+            "preferences-desktop-appearance-symbolic",
             Module::Appearance,
         ),
         (
             "Janelas",
             "Bordas, botões, foco e comportamento",
-            "preferences-system-windows-symbolic",
+            "window-new-symbolic",
             Module::Windows,
         ),
         (
@@ -131,13 +97,19 @@ fn native_page() -> gtk::Widget {
         (
             "Painel",
             "Posição, tamanho e plugins do painel",
-            "preferences-desktop-panel-symbolic",
+            "view-grid-symbolic",
             Module::Panel,
+        ),
+        (
+            "Bloqueio de tela",
+            "Proteção, bloqueio automático e tempo de inatividade",
+            "system-lock-screen-symbolic",
+            Module::Screensaver,
         ),
         (
             "Energia",
             "Suspensão, bateria, tela e economia de energia",
-            "preferences-system-power-symbolic",
+            "battery-symbolic",
             Module::Power,
         ),
         (
@@ -153,12 +125,17 @@ fn native_page() -> gtk::Widget {
         );
     }
     let content = gtk::Box::new(gtk::Orientation::Vertical, 12);
+    content.set_hexpand(true);
     content.set_margin_top(12);
     content.set_margin_bottom(12);
     content.append(&grid);
     gtk::ScrolledWindow::builder()
         .child(&content)
+        .hexpand(true)
+        .vexpand(true)
         .hscrollbar_policy(gtk::PolicyType::Never)
+        .vscrollbar_policy(gtk::PolicyType::Automatic)
+        .propagate_natural_height(false)
         .build()
         .upcast()
 }
@@ -168,10 +145,13 @@ fn native_card(title: &str, description: &str, icon: &str, module: Module) -> gt
     image.set_pixel_size(36);
     let labels = gtk::Box::new(gtk::Orientation::Vertical, 4);
     labels.set_hexpand(true);
+    labels.set_halign(gtk::Align::Fill);
     labels.append(
         &gtk::Label::builder()
             .label(title)
             .xalign(0.0)
+            .hexpand(true)
+            .width_chars(18)
             .css_classes(["heading"])
             .build(),
     );
@@ -179,6 +159,9 @@ fn native_card(title: &str, description: &str, icon: &str, module: Module) -> gt
         &gtk::Label::builder()
             .label(description)
             .xalign(0.0)
+            .hexpand(true)
+            .width_chars(24)
+            .max_width_chars(42)
             .wrap(true)
             .css_classes(["dim-label"])
             .build(),
@@ -194,6 +177,7 @@ fn native_card(title: &str, description: &str, icon: &str, module: Module) -> gt
     let button = gtk::Button::builder()
         .child(&row)
         .css_classes(["flat", "card"])
+        .width_request(330)
         .height_request(112)
         .hexpand(true)
         .build();

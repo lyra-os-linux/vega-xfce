@@ -3102,3 +3102,5 @@ msgstr "Eliminando puntos de restauración…"
 
 msgid "Fechar console"
 msgstr "Cerrar consola"
+msgid "Proteção, bloqueio automático e tempo de inatividade"
+msgstr "Protección, bloqueo automático y tiempo de inactividad"

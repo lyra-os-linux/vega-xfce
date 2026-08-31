@@ -4362,7 +4362,7 @@ mod tests {
 
     #[test]
     fn production_id_is_stable() {
-        assert_eq!(APPLICATION_ID, "org.lyraos.Vega");
+        assert_eq!(APPLICATION_ID, "org.lyraos.Vega.Xfce");
     }
 
     #[test]

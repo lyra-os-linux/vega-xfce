@@ -3122,3 +3122,5 @@ msgstr "Excluindo pontos de restauração…"
 
 msgid "Fechar console"
 msgstr "Fechar console"
+msgid "Proteção, bloqueio automático e tempo de inatividade"
+msgstr "Proteção, bloqueio automático e tempo de inatividade"

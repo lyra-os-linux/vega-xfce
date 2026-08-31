@@ -3140,3 +3140,5 @@ msgstr ""
 
 msgid "Fechar console"
 msgstr ""
+msgid "Proteção, bloqueio automático e tempo de inatividade"
+msgstr ""
