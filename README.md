@@ -26,11 +26,14 @@ repository — see [Architecture](#architecture) below.
 - dashboard with system-health information and shortcuts;
 - Zypper packages, Flatpak applications, updates, and repositories;
 - optional snapshots with Snapper or Timeshift, and backups with Restic;
-- hardware inventory, drivers, kernel, and bootloader;
+- hardware inventory, kernel, and bootloader;
 - storage, date, time, and locale;
 - network, Wi-Fi, Bluetooth, firewall, VPN, proxy, and IPv4;
 - users, services, logs, and live process monitoring;
 - wallpaper, screen-lock preferences, and a multi-provider AI assistant.
+
+Driver installation and switching, including NVIDIA and optional hardware firmware,
+are no longer offered by Vega. Hardware inventory and GPU monitoring remain available.
 
 Features backed by optional programs are shown as unavailable when their
 dependency is missing without preventing the other pages from working.

@@ -23,14 +23,6 @@ pub struct VegaShell {
     pub hardware_gpu: gtk::Label,
     pub hardware_ram: gtk::Label,
     pub hardware_firmware: gtk::Label,
-    pub nvidia_title: gtk::Label,
-    pub nvidia_detail: gtk::Label,
-    pub nvidia_install: gtk::Button,
-    pub nvidia_check: gtk::Button,
-    pub nvidia_progress: gtk::ProgressBar,
-    pub firmware_detail: gtk::Label,
-    pub firmware_install: gtk::Button,
-    pub firmware_progress: gtk::ProgressBar,
     pub software: SoftwarePage,
     pub backup: BackupPage,
     pub snapshots: SnapshotsPage,
@@ -61,8 +53,6 @@ impl VegaShell {
         let hardware_gpu = value_label(&gettext("Carregando…"));
         let hardware_ram = value_label(&gettext("Carregando…"));
         let hardware_firmware = value_label(&gettext("Carregando…"));
-        let nvidia = nvidia_card();
-        let firmware = non_free_firmware_card();
         let software = SoftwarePage::new();
         let backup = BackupPage::new();
         let snapshots = SnapshotsPage::new();
@@ -153,8 +143,6 @@ impl VegaShell {
                             &hardware_gpu,
                             &hardware_ram,
                             &hardware_firmware,
-                            &nvidia.root,
-                            &firmware.root,
                         ),
                     ),
                     (gettext("Kernel"), kernel.root.clone()),
@@ -325,14 +313,6 @@ impl VegaShell {
             hardware_gpu,
             hardware_ram,
             hardware_firmware,
-            nvidia_title: nvidia.title,
-            nvidia_detail: nvidia.detail,
-            nvidia_install: nvidia.install,
-            nvidia_check: nvidia.check,
-            nvidia_progress: nvidia.progress,
-            firmware_detail: firmware.detail,
-            firmware_install: firmware.install,
-            firmware_progress: firmware.progress,
             software,
             backup,
             snapshots,
@@ -731,114 +711,11 @@ fn add_nav_section(
     }
 }
 
-struct NvidiaWidgets {
-    root: gtk::Box,
-    title: gtk::Label,
-    detail: gtk::Label,
-    install: gtk::Button,
-    check: gtk::Button,
-    progress: gtk::ProgressBar,
-}
-
-struct FirmwareWidgets {
-    root: gtk::Box,
-    detail: gtk::Label,
-    install: gtk::Button,
-    progress: gtk::ProgressBar,
-}
-
-fn non_free_firmware_card() -> FirmwareWidgets {
-    let title = gtk::Label::builder()
-        .label(gettext("Firmware não livre"))
-        .xalign(0.0)
-        .css_classes(["title-3"])
-        .build();
-    let detail = gtk::Label::builder()
-        .label(gettext("Verificando firmware compatível…"))
-        .xalign(0.0)
-        .wrap(true)
-        .css_classes(["dim-label"])
-        .build();
-    let install = gtk::Button::builder()
-        .label(gettext("Instalar firmware compatível"))
-        .halign(gtk::Align::Start)
-        .sensitive(false)
-        .css_classes(["suggested-action"])
-        .build();
-    let progress = gtk::ProgressBar::builder()
-        .show_text(true)
-        .visible(false)
-        .build();
-    let root = gtk::Box::new(gtk::Orientation::Vertical, 8);
-    root.add_css_class("card");
-    root.append(&title);
-    root.append(&detail);
-    root.append(&progress);
-    root.append(&install);
-    FirmwareWidgets {
-        root,
-        detail,
-        install,
-        progress,
-    }
-}
-
-fn nvidia_card() -> NvidiaWidgets {
-    let title = gtk::Label::builder()
-        .label(gettext("Verificando hardware NVIDIA…"))
-        .xalign(0.0)
-        .hexpand(true)
-        .wrap(true)
-        .wrap_mode(gtk::pango::WrapMode::WordChar)
-        .css_classes(["title-3"])
-        .build();
-    let detail = gtk::Label::builder()
-        .label(gettext(
-            "A instalação G06 é opcional e usa o repositório oficial da NVIDIA.",
-        ))
-        .xalign(0.0)
-        .wrap(true)
-        .css_classes(["dim-label"])
-        .build();
-    let install = gtk::Button::builder()
-        .label(gettext("Instalar driver NVIDIA G06"))
-        .sensitive(false)
-        .css_classes(["suggested-action"])
-        .build();
-    let check = gtk::Button::builder()
-        .label(gettext("Verificar driver"))
-        .sensitive(false)
-        .build();
-    let actions = gtk::Box::new(gtk::Orientation::Horizontal, 8);
-    actions.append(&install);
-    actions.append(&check);
-    let progress = gtk::ProgressBar::builder()
-        .show_text(true)
-        .visible(false)
-        .build();
-    let root = gtk::Box::new(gtk::Orientation::Vertical, 8);
-    root.add_css_class("card");
-    root.append(&title);
-    root.append(&detail);
-    root.append(&progress);
-    root.append(&actions);
-    NvidiaWidgets {
-        root,
-        title,
-        detail,
-        install,
-        check,
-        progress,
-    }
-}
-
 fn hardware_page(
     cpu: &gtk::Label,
     gpu: &gtk::Label,
     ram: &gtk::Label,
     firmware: &gtk::Label,
-    nvidia: &gtk::Box,
-    firmware_card: &gtk::Box,
 ) -> gtk::Widget {
     let content = gtk::Box::builder()
         .orientation(gtk::Orientation::Vertical)
@@ -854,8 +731,6 @@ fn hardware_page(
     group.add(&property_row(&gettext("Memória"), ram));
     group.add(&property_row(&gettext("Firmware"), firmware));
     content.append(&group);
-    content.append(nvidia);
-    content.append(firmware_card);
     scrolled(content)
 }
 

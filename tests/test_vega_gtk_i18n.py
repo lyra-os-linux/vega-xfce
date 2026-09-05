@@ -41,7 +41,7 @@ class VegaGtkI18nTests(unittest.TestCase):
     def test_catalogs_have_identical_complete_keys_and_placeholders(self):
         catalogs = {locale: messages(PO_DIR / f"{locale}.po") for locale in LOCALES}
         expected = set(catalogs["en-US"])
-        self.assertGreaterEqual(len(expected), 729)
+        self.assertGreaterEqual(len(expected), 709)
         for locale, catalog in catalogs.items():
             self.assertEqual(set(catalog), expected, locale)
             self.assertTrue(all(catalog.values()), locale)

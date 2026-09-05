@@ -22,7 +22,7 @@ componentes têm cada um seu próprio repositório — ver
 - painel com resumo da saúde do sistema e atalhos;
 - pacotes Zypper, aplicativos Flatpak, atualizações e repositórios;
 - snapshots opcionais com Snapper ou Timeshift e backups com Restic;
-- inventário de hardware, drivers, kernel e bootloader;
+- inventário de hardware, kernel e bootloader;
 - armazenamento, data, hora e idioma;
 - rede, Wi-Fi, Bluetooth, firewall, VPN, proxy e IPv4;
 - usuários, serviços, logs e monitor de processos em tempo real;
@@ -30,6 +30,10 @@ componentes têm cada um seu próprio repositório — ver
 
 Recursos que dependem de programas opcionais aparecem como indisponíveis quando
 a dependência não está instalada, sem impedir o uso das outras telas.
+
+A instalação e a troca de drivers, incluindo NVIDIA e firmware opcional, foram
+removidas do Vega. O inventário de hardware e a monitoração da GPU continuam disponíveis.
+
 
 ## Arquitetura
 

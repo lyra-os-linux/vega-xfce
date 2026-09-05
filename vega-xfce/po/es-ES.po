@@ -2943,65 +2943,6 @@ msgstr "El proveedor rechazó la solicitud ({status}): {detail}"
 msgid "Falha de comunicação com o provedor: {detail}"
 msgstr "Fallo de comunicación con el proveedor: {detail}"
 
-msgid "A instalação G06 é opcional e usa o repositório oficial da NVIDIA."
-msgstr "La instalación de G06 es opcional y utiliza el repositorio oficial de NVIDIA."
-
-msgid "Secure Boot ativado; será usado o módulo aberto assinado."
-msgstr "Secure Boot está activado; se utilizará el módulo abierto firmado."
-
-msgid "Verificar driver"
-msgstr "Verificar controlador"
-
-msgid "Driver NVIDIA requer atenção"
-msgstr "El controlador NVIDIA requiere atención"
-
-msgid "Driver NVIDIA opcional"
-msgstr "Controlador NVIDIA opcional"
-
-msgid "Secure Boot desativado."
-msgstr "Secure Boot está desactivado."
-
-msgid "NVIDIA G06 — {gpu}"
-msgstr "NVIDIA G06 — {gpu}"
-
-msgid "{detail}\n{secure_boot}"
-msgstr "{detail}\n{secure_boot}"
-
-msgid "O Vega criará um snapshot somente leitura, adicionará o repositório oficial da NVIDIA, instalará módulo assinado, userspace e firmware em conjunto e regenerará o initramfs. Será necessário reiniciar. Não desligue o computador durante a transação."
-msgstr "Vega creará una instantánea de solo lectura, añadirá el repositorio oficial de NVIDIA, instalará juntos el módulo firmado, el espacio de usuario y el firmware, y regenerará el initramfs. Será necesario reiniciar. No apague el equipo durante la transacción."
-
-msgid "Instalar o driver NVIDIA G06?"
-msgstr "¿Instalar el controlador NVIDIA G06?"
-
-msgid "Preparando instalação NVIDIA G06…"
-msgstr "Preparando la instalación de NVIDIA G06…"
-
-msgid "Driver NVIDIA ativo"
-msgstr "Controlador NVIDIA activo"
-
-msgid "Não foi possível determinar o estado do Secure Boot."
-msgstr "No se pudo determinar el estado de Secure Boot."
-
-msgid "Instalar driver NVIDIA G06"
-msgstr "Instalar controlador NVIDIA G06"
-
-msgid "Verificando hardware NVIDIA…"
-msgstr "Comprobando el hardware NVIDIA…"
-
-msgid "Instalar firmware compatível"
-msgstr "Instalar firmware compatible"
-
-msgid "Instalar firmware não livre?"
-msgstr "¿Instalar firmware no libre?"
-
-msgid "Verificando firmware compatível…"
-msgstr "Comprobando firmware compatible…"
-
-msgid "Firmware não livre"
-msgstr "Firmware no libre"
-
-msgid "O Vega instalará somente pacotes do repositório non-oss associados de forma inequívoca ao hardware detectado. Um snapshot somente leitura será criado antes da alteração."
-msgstr "Vega instalará únicamente paquetes del repositorio non-oss asociados inequívocamente con el hardware detectado. Se creará una instantánea de solo lectura antes del cambio."
 msgid "Barra superior"
 msgstr "Barra superior"
 

@@ -2029,7 +2029,7 @@ dependencies = [
 
 [[package]]
 name = "vega-xfce"
-version = "5.1.29"
+version = "5.1.30"
 dependencies = [
  "base64",
  "futures-util",

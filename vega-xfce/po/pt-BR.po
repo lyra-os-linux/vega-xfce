@@ -1098,58 +1098,6 @@ msgstr "Concluído"
 msgid "Falhou"
 msgstr "Falhou"
 
-#: vega-gtk/src/application.rs:3555
-msgid "Driver NVIDIA opcional"
-msgstr "Driver NVIDIA opcional"
-
-#: vega-gtk/src/application.rs:3557
-msgid "NVIDIA G06 — {gpu}"
-msgstr "NVIDIA G06 — {gpu}"
-
-#: vega-gtk/src/application.rs:3561
-msgid "Secure Boot ativado; será usado o módulo aberto assinado."
-msgstr "Secure Boot ativado; será usado o módulo aberto assinado."
-
-#: vega-gtk/src/application.rs:3563
-msgid "Secure Boot desativado."
-msgstr "Secure Boot desativado."
-
-#: vega-gtk/src/application.rs:3564
-msgid "Não foi possível determinar o estado do Secure Boot."
-msgstr "Não foi possível determinar o estado do Secure Boot."
-
-#: vega-gtk/src/application.rs:3567
-msgid "{detail}\n{secure_boot}"
-msgstr "{detail}\n{secure_boot}"
-
-#: vega-gtk/src/application.rs:3588
-msgid "Instalar o driver NVIDIA G06?"
-msgstr "Instalar o driver NVIDIA G06?"
-
-#: vega-gtk/src/application.rs:3590
-msgid "O Vega criará um snapshot somente leitura, adicionará o repositório oficial da NVIDIA, instalará módulo assinado, userspace e firmware em conjunto e regenerará o initramfs. Será necessário reiniciar. Não desligue o computador durante a transação."
-msgstr "O Vega criará um snapshot somente leitura, adicionará o repositório oficial da NVIDIA, instalará módulo assinado, userspace e firmware em conjunto e regenerará o initramfs. Será necessário reiniciar. Não desligue o computador durante a transação."
-
-#: vega-gtk/src/application.rs:3604 vega-gtk/src/application.rs:3607
-msgid "Preparando instalação NVIDIA G06…"
-msgstr "Preparando instalação NVIDIA G06…"
-
-#: vega-gtk/src/application.rs:3667
-msgid "Driver NVIDIA ativo"
-msgstr "Driver NVIDIA ativo"
-
-#: vega-gtk/src/application.rs:3669
-msgid "Driver NVIDIA requer atenção"
-msgstr "Driver NVIDIA requer atenção"
-
-#: vega-gtk/src/application.rs:3701
-msgid "Instalar firmware não livre?"
-msgstr "Instalar firmware não livre?"
-
-#: vega-gtk/src/application.rs:3703
-msgid "O Vega instalará somente pacotes do repositório non-oss associados de forma inequívoca ao hardware detectado. Um snapshot somente leitura será criado antes da alteração."
-msgstr "O Vega instalará somente pacotes do repositório non-oss associados de forma inequívoca ao hardware detectado. Um snapshot somente leitura será criado antes da alteração."
-
 #: vega-gtk/src/application.rs:3754 vega-gtk/src/ui/software.rs:745
 msgid "Desativar"
 msgstr "Desativar"
@@ -2511,34 +2459,6 @@ msgstr "Atualizações"
 #: vega-gtk/src/ui/shell.rs:626
 msgid "Disco (/)"
 msgstr "Disco (/)"
-
-#: vega-gtk/src/ui/shell.rs:737
-msgid "Firmware não livre"
-msgstr "Firmware não livre"
-
-#: vega-gtk/src/ui/shell.rs:742
-msgid "Verificando firmware compatível…"
-msgstr "Verificando firmware compatível…"
-
-#: vega-gtk/src/ui/shell.rs:748
-msgid "Instalar firmware compatível"
-msgstr "Instalar firmware compatível"
-
-#: vega-gtk/src/ui/shell.rs:773
-msgid "Verificando hardware NVIDIA…"
-msgstr "Verificando hardware NVIDIA…"
-
-#: vega-gtk/src/ui/shell.rs:780
-msgid "A instalação G06 é opcional e usa o repositório oficial da NVIDIA."
-msgstr "A instalação G06 é opcional e usa o repositório oficial da NVIDIA."
-
-#: vega-gtk/src/ui/shell.rs:787
-msgid "Instalar driver NVIDIA G06"
-msgstr "Instalar driver NVIDIA G06"
-
-#: vega-gtk/src/ui/shell.rs:792
-msgid "Verificar driver"
-msgstr "Verificar driver"
 
 #: vega-gtk/src/ui/shell.rs:833
 msgid "Componentes"
