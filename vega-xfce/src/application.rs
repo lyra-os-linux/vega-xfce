@@ -1602,7 +1602,7 @@ fn configure_network(shell: &VegaShell, window: &adw::ApplicationWindow, dbus: V
         let page = interface_page.clone();
         let dbus = interface_dbus.clone();
         glib::MainContext::default().spawn_local(async move {
-            if !confirm_dialog(&dialog, "apply").await {
+            if !form_dialog(&dialog, "apply").await {
                 return;
             }
             let connection = connection.text().trim().to_owned();
@@ -1684,7 +1684,7 @@ fn configure_network(shell: &VegaShell, window: &adw::ApplicationWindow, dbus: V
         let page = wifi_page.clone();
         let dbus = wifi_dbus.clone();
         glib::MainContext::default().spawn_local(async move {
-            if !confirm_dialog(&dialog, "confirm").await {
+            if !form_dialog(&dialog, "confirm").await {
                 return;
             }
             let secret = password.text().to_string();
@@ -2631,7 +2631,7 @@ fn configure_snapshots(shell: &VegaShell, dbus: VegaDbus) {
         let page = create_page.clone();
         let client = create_dbus.snapshots();
         glib::MainContext::default().spawn_local(async move {
-            if !confirm_dialog(&dialog, "create").await {
+            if !form_dialog(&dialog, "create").await {
                 return;
             }
             let description = description.text().trim().to_owned();
@@ -2829,7 +2829,7 @@ fn configure_snapshots(shell: &VegaShell, dbus: VegaDbus) {
             dialog.set_response_appearance("rollback", adw::ResponseAppearance::Destructive);
             dialog.set_default_response(Some("cancel"));
             dialog.set_close_response("cancel");
-            if !confirm_dialog(&dialog, "rollback").await {
+            if !form_dialog(&dialog, "rollback").await {
                 button.set_sensitive(true);
                 return;
             }
@@ -3005,7 +3005,7 @@ fn configure_backup(shell: &VegaShell, dbus: VegaDbus) {
         let page = create_page.clone();
         let client = create_dbus.backup();
         glib::MainContext::default().spawn_local(async move {
-            if !confirm_dialog(&dialog, "create").await {
+            if !form_dialog(&dialog, "create").await {
                 return;
             }
             let parsed_paths = paths
@@ -4147,13 +4147,24 @@ fn send_notification(title: &str, body: &str, id: &str) {
 }
 
 async fn confirm_dialog(dialog: &adw::AlertDialog, response: &str) -> bool {
-    !crate::preferences::confirmations_enabled()
+    should_bypass_confirmation(false, crate::preferences::confirmations_enabled())
         || dialog.clone().choose_future(gtk::Widget::NONE).await == response
+}
+
+fn should_bypass_confirmation(is_form: bool, confirmations_enabled: bool) -> bool {
+    !is_form && !confirmations_enabled
+}
+
+/// Apresenta diálogos que contêm campos ou informações que o usuário precisa
+/// revisar. A preferência de confirmação só pode ignorar a aprovação de uma
+/// ação já preenchida; ela nunca pode pular a coleta desses dados.
+async fn form_dialog(dialog: &adw::AlertDialog, response: &str) -> bool {
+    dialog.clone().choose_future(gtk::Widget::NONE).await == response
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{APPLICATION_ID, valid_ipv4_cidr};
+    use super::{APPLICATION_ID, should_bypass_confirmation, valid_ipv4_cidr};
 
     #[test]
     fn production_id_is_stable() {
@@ -4167,5 +4178,12 @@ mod tests {
         assert!(!valid_ipv4_cidr("192.168.1.20"));
         assert!(!valid_ipv4_cidr("192.168.1.20/33"));
         assert!(!valid_ipv4_cidr("not-an-address/24"));
+    }
+
+    #[test]
+    fn disabling_confirmations_only_bypasses_action_approval() {
+        assert!(should_bypass_confirmation(false, false));
+        assert!(!should_bypass_confirmation(false, true));
+        assert!(!should_bypass_confirmation(true, false));
     }
 }
