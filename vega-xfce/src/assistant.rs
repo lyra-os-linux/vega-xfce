@@ -299,7 +299,17 @@ pub fn save_history(messages: &[Message]) -> Result<(), AssistantError> {
 }
 
 pub fn clear_history() -> Result<(), AssistantError> {
-    save_history(&[])
+    // Clearing is an explicit privacy action and must remove an existing file
+    // even when future persistence has been disabled in preferences.
+    clear_history_file(&private_file("ai-history.json")?)
+}
+
+fn clear_history_file(path: &std::path::Path) -> Result<(), AssistantError> {
+    match fs::remove_file(path) {
+        Ok(()) => Ok(()),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(()),
+        Err(error) => Err(error.into()),
+    }
 }
 
 fn write_private(name: &str, contents: &[u8]) -> Result<(), AssistantError> {
@@ -1016,5 +1026,15 @@ mod tests {
         assert!(install_origin_allowed("official"));
         assert!(install_origin_allowed("FLATHUB"));
         assert!(!install_origin_allowed("unknown"));
+    }
+
+    #[test]
+    fn clearing_history_removes_file_even_when_persistence_is_disabled() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("ai-history.json");
+        std::fs::write(&path, "[{\"role\":\"user\"}]\n").unwrap();
+        clear_history_file(&path).unwrap();
+        assert!(!path.exists());
+        clear_history_file(&path).unwrap();
     }
 }
