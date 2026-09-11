@@ -1,9 +1,10 @@
 use std::{
     fs::{self, OpenOptions},
-    io::Write,
+    io::{BufRead, BufReader, Write},
     os::unix::fs::{OpenOptionsExt, PermissionsExt},
     path::{Path, PathBuf},
     process::{Command, Stdio},
+    sync::atomic::{AtomicU64, Ordering},
     time::Duration,
 };
 
@@ -298,8 +299,94 @@ pub fn save_history(messages: &[Message]) -> Result<(), AssistantError> {
     )
 }
 
+/// Explicit deletion is independent of the preference controlling future saves.
+/// Remove legacy conversational audit copies first. On any failure the UI keeps
+/// its in-memory conversation and reports the error; a retry is safe.
 pub fn clear_history() -> Result<(), AssistantError> {
-    save_history(&[])
+    clear_history_in(&data_dir())
+}
+
+fn clear_history_in(dir: &Path) -> Result<(), AssistantError> {
+    prune_conversation_audit(dir).map_err(|error| {
+        AssistantError::Message(
+            gettext("Não foi possível limpar as cópias da conversa no registro de ações: {detail}")
+                .replace("{detail}", &error.to_string()),
+        )
+    })?;
+    match fs::remove_file(dir.join("ai-history.json")) {
+        Ok(()) => fs::File::open(dir)?.sync_all()?,
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+        Err(error) => return Err(error.into()),
+    }
+    Ok(())
+}
+
+fn is_conversation_audit(kind: &str) -> bool {
+    matches!(
+        kind,
+        "user_message" | "assistant_message" | "user_attachment"
+    )
+}
+
+fn prune_conversation_audit(dir: &Path) -> Result<(), AssistantError> {
+    let path = dir.join("ai-audit.jsonl");
+    match fs::symlink_metadata(&path) {
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(()),
+        Err(error) => return Err(error.into()),
+        Ok(metadata) if !metadata.file_type().is_file() => {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::InvalidData,
+                "audit path is not a regular file",
+            )
+            .into());
+        }
+        Ok(_) => {}
+    }
+    let input = fs::File::open(&path)?;
+    static NEXT_TEMP: AtomicU64 = AtomicU64::new(0);
+    let temporary = dir.join(format!(
+        ".ai-audit-clear-{}-{}",
+        std::process::id(),
+        NEXT_TEMP.fetch_add(1, Ordering::Relaxed)
+    ));
+    let mut output = OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .mode(0o600)
+        .open(&temporary)?;
+    let result = (|| -> Result<(), AssistantError> {
+        let mut removed = false;
+        for line in BufReader::new(input).split(b'\n') {
+            let line = line?;
+            if !line.iter().all(u8::is_ascii_whitespace) {
+                let entry: Value = serde_json::from_slice(&line)?;
+                let kind = entry.get("kind").and_then(Value::as_str).ok_or_else(|| {
+                    std::io::Error::new(std::io::ErrorKind::InvalidData, "audit entry has no kind")
+                })?;
+                if is_conversation_audit(kind) {
+                    removed = true;
+                    continue;
+                }
+            }
+            output.write_all(&line)?;
+            output.write_all(b"\n")?;
+        }
+        if removed {
+            output.sync_all()?;
+            fs::rename(&temporary, &path)?;
+            fs::File::open(dir)?.sync_all()?;
+        }
+        Ok(())
+    })();
+    // Only our create_new temporary file is removed; never recurse or follow links.
+    let cleanup = fs::remove_file(&temporary);
+    result?;
+    if let Err(error) = cleanup
+        && error.kind() != std::io::ErrorKind::NotFound
+    {
+        return Err(error.into());
+    }
+    Ok(())
 }
 
 fn write_private(name: &str, contents: &[u8]) -> Result<(), AssistantError> {
@@ -582,6 +669,11 @@ pub fn redact(text: &str) -> String {
 }
 
 pub fn audit(kind: &str, detail: &str) -> Result<(), AssistantError> {
+    // Conversation persistence belongs only to ai-history.json. Keep the
+    // separate audit for operational events, never duplicate messages/attachments.
+    if is_conversation_audit(kind) {
+        return Ok(());
+    }
     let path = private_file("ai-audit.jsonl")?;
     let entry = json!({ "timestamp": glib::DateTime::now_local().ok().and_then(|d| d.format_iso8601().ok()).map(|s| s.to_string()).unwrap_or_default(), "kind": kind, "detail": redact(detail) });
     let mut file = OpenOptions::new()
@@ -1018,3 +1110,7 @@ mod tests {
         assert!(!install_origin_allowed("unknown"));
     }
 }
+
+#[cfg(test)]
+#[path = "assistant_history_tests.rs"]
+mod history_tests;

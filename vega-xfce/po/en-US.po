@@ -3045,3 +3045,18 @@ msgid "Fechar console"
 msgstr "Close console"
 msgid "Proteção, bloqueio automático e tempo de inatividade"
 msgstr "Protection, automatic locking, and inactivity timeout"
+
+msgid "Aguarde a operação em andamento antes de limpar a conversa."
+msgstr "Wait for the current operation to finish before clearing the conversation."
+
+msgid "Conversa e anexos locais apagados. O registro de ações do sistema foi mantido."
+msgstr "Conversation and local attachments deleted. The system action log was retained."
+
+msgid "Não foi possível limpar as cópias da conversa no registro de ações: {detail}"
+msgstr "Could not clear conversation copies from the action log: {detail}"
+
+msgid "Falha interna ao limpar a conversa."
+msgstr "Internal error while clearing the conversation."
+
+msgid "Limpando conversa…"
+msgstr "Clearing conversation…"

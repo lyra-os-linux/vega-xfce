@@ -1,7 +1,10 @@
 use crate::assistant::{Attachment, Message, Provider, Settings};
 use crate::i18n::gettext;
 use adw::prelude::*;
-use std::{cell::RefCell, rc::Rc};
+use std::{
+    cell::{Cell, RefCell},
+    rc::Rc,
+};
 
 #[derive(Clone)]
 pub struct AssistantPage {
@@ -25,6 +28,7 @@ pub struct AssistantPage {
     history: Rc<RefCell<Vec<Message>>>,
     models: Rc<RefCell<Vec<String>>>,
     pending_attachments: Rc<RefCell<Vec<Attachment>>>,
+    busy: Rc<Cell<bool>>,
 }
 
 impl AssistantPage {
@@ -256,6 +260,7 @@ impl AssistantPage {
             history: Rc::new(RefCell::new(history)),
             models: Rc::new(RefCell::new(vec![settings.model().to_owned()])),
             pending_attachments: Rc::new(RefCell::new(Vec::new())),
+            busy: Rc::new(Cell::new(false)),
         };
         page.render_history();
         page
@@ -333,11 +338,35 @@ impl AssistantPage {
             self.render_history();
         }
     }
-    pub fn clear(&self) {
+    pub async fn clear(&self) -> Result<(), crate::assistant::AssistantError> {
+        if self.is_busy() {
+            return Err(crate::assistant::AssistantError::Message(gettext(
+                "Aguarde a operação em andamento antes de limpar a conversa.",
+            )));
+        }
+        self.set_busy(true);
+        self.status.set_label(&gettext("Limpando conversa…"));
+        let result = gtk::gio::spawn_blocking(crate::assistant::clear_history).await;
+        self.set_busy(false);
+        result.map_err(|_| {
+            crate::assistant::AssistantError::Message(gettext(
+                "Falha interna ao limpar a conversa.",
+            ))
+        })??;
         self.history.borrow_mut().clear();
+        self.pending_attachments.borrow_mut().clear();
+        self.clear_prompt();
         self.render_history();
+        self.render_attachments();
+        Ok(())
+    }
+    pub fn is_busy(&self) -> bool {
+        self.busy.get()
     }
     pub fn set_busy(&self, busy: bool) {
+        self.busy.set(busy);
+        self.clear_history.set_sensitive(!busy);
+        self.attach.set_sensitive(!busy);
         self.prompt.set_sensitive(!busy);
         self.send.set_sensitive(!busy);
         self.send.set_label(&if busy {

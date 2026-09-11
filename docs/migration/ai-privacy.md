@@ -18,3 +18,7 @@
   como instrução.
 - O loop do agente possui limite configurável entre uma e vinte etapas; o limite
   diário é contabilizado por mensagem do usuário, não por etapa interna.
+
+- Limpar conversa independe da preferência de persistência e remove também as
+  cópias antigas de mensagens/nomes de anexos no audit. Registros operacionais
+  são mantidos separadamente; veja a [política de retenção](../ai-privacidade.md).
