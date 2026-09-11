@@ -30,7 +30,7 @@ Toda vez que você envia uma mensagem no chat, o seguinte é enviado para a API 
 
 - Sua chave de API nunca é enviada a nenhum servidor além do próprio provedor
   escolhido; ela fica no Secret Service/keyring do sistema.
-- Nenhuma ação de mutação é executada sem confirmação explícita sua no diálogo — o modelo nunca autoriza uma ação sozinho a partir de texto livre.
+- Nenhuma ação de mutação é executada sem confirmação explícita sua no diálogo — o modelo nunca autoriza uma ação sozinho a partir de texto livre. Desativar “Confirmar ações administrativas” nos ajustes não dispensa a aprovação das propostas da IA.
 - Módulos ainda fora do escopo do assistente não têm ferramentas disponíveis
   para o modelo, mesmo quando possuem controles próprios na interface.
 - O log de auditoria local (`ai-audit.jsonl`, na pasta de dados do usuário) nunca sai do seu computador — registra ações do sistema e erros redigidos para consulta posterior. Mensagens e nomes de anexos não são mais duplicados nesse log.

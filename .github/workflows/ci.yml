@@ -53,6 +53,9 @@ jobs:
       - name: Verify history deletion in real GTK with isolated user data
         run: xvfb-run -a dbus-run-session -- cargo test --workspace --locked native_history_ui -- --ignored --test-threads=1
 
+      - name: Verify forms and required approvals with a private D-Bus fixture
+        run: xvfb-run -a cargo test --workspace --locked native_dialog_flows -- --ignored --test-threads=1
+
   translations:
     name: Inventário de traduções
     runs-on: ubuntu-latest

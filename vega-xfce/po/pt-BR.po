@@ -2409,8 +2409,8 @@ msgid "Confirmar ações administrativas"
 msgstr "Confirmar ações administrativas"
 
 #: vega-gtk/src/ui/shell.rs:440
-msgid "Solicitar confirmação antes de alterações no sistema"
-msgstr "Solicitar confirmação antes de alterações no sistema"
+msgid "Confirmar ações já definidas. Formulários, propostas da IA e revisões de segurança sempre serão exibidos."
+msgstr "Confirmar ações já definidas. Formulários, propostas da IA e revisões de segurança sempre serão exibidos."
 
 #: vega-gtk/src/ui/shell.rs:448
 msgid "Notificações"
