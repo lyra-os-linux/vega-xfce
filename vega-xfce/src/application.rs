@@ -395,16 +395,25 @@ fn configure_assistant(shell: &VegaShell, window: &adw::ApplicationWindow, dbus:
 
     let clear_page = page.clone();
     page.clear_history.connect_clicked(move |_| {
-        clear_page.clear();
-        match crate::assistant::clear_history() {
-            Ok(()) => clear_page.status.set_label(&gettext("Conversa limpa")),
-            Err(error) => clear_page.status.set_label(&error.to_string()),
+        if clear_page.is_busy() {
+            return;
         }
+        let page = clear_page.clone();
+        glib::MainContext::default().spawn_local(async move {
+            match page.clear().await {
+                Ok(()) => page.status.set_label(&gettext("Conversa e anexos locais apagados. O registro de ações do sistema foi mantido.")),
+                Err(error) => page.status.set_label(&error.to_string()),
+            }
+        });
     });
 
     let attach_page = page.clone();
     let attach_window = window.clone();
     page.attach.connect_clicked(move |_| {
+        if attach_page.is_busy() {
+            return;
+        }
+        attach_page.set_busy(true);
         let filter = gtk::FileFilter::new();
         filter.set_name(Some(&gettext("Imagens e arquivos de texto")));
         filter.add_mime_type("image/*");
@@ -419,6 +428,7 @@ fn configure_assistant(shell: &VegaShell, window: &adw::ApplicationWindow, dbus:
         let window = attach_window.clone();
         glib::MainContext::default().spawn_local(async move {
             let Ok(files) = dialog.open_multiple_future(Some(&window)).await else {
+                page.set_busy(false);
                 return;
             };
             for index in 0..files.n_items() {
@@ -440,6 +450,7 @@ fn configure_assistant(shell: &VegaShell, window: &adw::ApplicationWindow, dbus:
                         .set_label(&gettext("Falha interna ao ler o arquivo")),
                 }
             }
+            page.set_busy(false);
         });
     });
 
@@ -485,10 +496,15 @@ fn connect_assistant_send(button: &gtk::Button, page: &crate::ui::AssistantPage,
     let page = page.clone();
     let dbus = dbus.clone();
     button.connect_clicked(move |_| {
+        if page.is_busy() {
+            return;
+        }
         let prompt = page.prompt_text();
         if prompt.is_empty() && !page.has_staged_attachments() {
             return;
         }
+        // Mark busy before spawning so clear/import/send cannot race the task.
+        page.set_busy(true);
         page.clear_prompt();
         let attachments = page.take_staged_attachments();
         for attachment in &attachments {
@@ -500,13 +516,13 @@ fn connect_assistant_send(button: &gtk::Button, page: &crate::ui::AssistantPage,
         let settings = page.settings();
         if let Err(error) = crate::assistant::save_settings(&settings) {
             page.status.set_label(&error.to_string());
+            page.set_busy(false);
             return;
         }
         let history = page.history();
         let request_page = page.clone();
         let request_dbus = dbus.clone();
         glib::MainContext::default().spawn_local(async move {
-            request_page.set_busy(true);
             request_page
                 .status
                 .set_label(&gettext("Consultando o provedor…"));

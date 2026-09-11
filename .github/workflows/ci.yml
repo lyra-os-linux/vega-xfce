@@ -21,7 +21,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
-            libgtk-4-dev libadwaita-1-dev pkg-config build-essential gettext locales
+            libgtk-4-dev libadwaita-1-dev pkg-config build-essential gettext locales xvfb xauth dbus-x11
           # O código chama setlocale() com o nome nu (ex.: "en_US", sem
           # sufixo .UTF-8), que é a convenção do glibc-locale usado na
           # distro-alvo (openSUSE Leap). locale-gen, no Ubuntu do runner,
@@ -49,6 +49,9 @@ jobs:
 
       - name: cargo test --workspace --locked
         run: cargo test --workspace --locked
+
+      - name: Verify history deletion in real GTK with isolated user data
+        run: xvfb-run -a dbus-run-session -- cargo test --workspace --locked native_history_ui -- --ignored --test-threads=1
 
   translations:
     name: Inventário de traduções
