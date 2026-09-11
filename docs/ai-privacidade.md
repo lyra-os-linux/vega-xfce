@@ -33,7 +33,7 @@ Toda vez que você envia uma mensagem no chat, o seguinte é enviado para a API 
 - Nenhuma ação de mutação é executada sem confirmação explícita sua no diálogo — o modelo nunca autoriza uma ação sozinho a partir de texto livre.
 - Módulos ainda fora do escopo do assistente não têm ferramentas disponíveis
   para o modelo, mesmo quando possuem controles próprios na interface.
-- O log de auditoria local (`ai-audit.jsonl`, na pasta de dados do usuário) nunca sai do seu computador — é só um registro local do que foi perguntado/feito, pra você auditar depois.
+- O log de auditoria local (`ai-audit.jsonl`, na pasta de dados do usuário) nunca sai do seu computador — registra ações do sistema e erros redigidos para consulta posterior. Mensagens e nomes de anexos não são mais duplicados nesse log.
 
 ## Mitigação contra prompt injection
 
@@ -72,3 +72,22 @@ na tela Software e exige confirmação explícita do usuário.
 ## Cobertura de leitura
 
 O assistente cobre leitura de: Software, Hardware, Disco/Armazenamento, Kernel, Rede, Firewall (status), Data/Hora, Monitor de Sistema, Usuários, Serviços, Snapshots e Log do systemd (com o limite de 100 linhas citado acima). Ainda sem cobertura de leitura: Backup, Bluetooth, Proxy, Boot/Bootloader — perguntas sobre esses módulos não têm como ser respondidas com dado real ainda.
+
+## Limpar conversa e retenção local
+
+“Limpar conversa” apaga o histórico local mesmo quando salvar histórico está
+desativado. Os anexos enviados ficam embutidos nesse arquivo e suas cópias são
+apagadas junto dele. Também limpa rascunhos e anexos pendentes da interface;
+os arquivos originais escolhidos pelo usuário permanecem no lugar.
+
+Cópias antigas de mensagens e nomes de anexos no `ai-audit.jsonl` são removidas
+na mesma ação. Registros operacionais (ações propostas/aprovadas/recusadas,
+leituras, rejeições de ferramentas e erros redigidos) permanecem separados,
+sem prazo automático de expiração nesta versão. Limpar conversa não redefine
+limites de uso, configurações nem credenciais do keyring.
+
+A ação fica indisponível enquanto uma resposta, ferramenta ou importação de
+anexo está em andamento, evitando repovoar a conversa logo após a limpeza.
+Em caso de falha, o Vega informa o erro e preserva a conversa na interface.
+A exclusão local não apaga dados já enviados ao provedor, cópias de segurança
+ou snapshots; não equivale a sobrescrita segura do armazenamento.

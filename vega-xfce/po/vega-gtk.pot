@@ -3061,3 +3061,18 @@ msgid "Fechar console"
 msgstr ""
 msgid "Proteção, bloqueio automático e tempo de inatividade"
 msgstr ""
+
+msgid "Aguarde a operação em andamento antes de limpar a conversa."
+msgstr ""
+
+msgid "Conversa e anexos locais apagados. O registro de ações do sistema foi mantido."
+msgstr ""
+
+msgid "Não foi possível limpar as cópias da conversa no registro de ações: {detail}"
+msgstr ""
+
+msgid "Falha interna ao limpar a conversa."
+msgstr ""
+
+msgid "Limpando conversa…"
+msgstr ""
