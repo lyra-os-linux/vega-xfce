@@ -777,7 +777,7 @@ async fn handle_assistant_mutation(
     );
     dialog.set_default_response(Some("cancel"));
     dialog.set_close_response("cancel");
-    if !confirm_dialog(&dialog, "confirm").await {
+    if !required_dialog(&dialog, "confirm").await {
         page.append(
             "assistant",
             gettext("A proposta foi rejeitada. Nenhuma alteração foi realizada."),
@@ -1618,7 +1618,7 @@ fn configure_network(shell: &VegaShell, window: &adw::ApplicationWindow, dbus: V
         let page = interface_page.clone();
         let dbus = interface_dbus.clone();
         glib::MainContext::default().spawn_local(async move {
-            if !form_dialog(&dialog, "apply").await {
+            if !required_dialog(&dialog, "apply").await {
                 return;
             }
             let connection = connection.text().trim().to_owned();
@@ -1700,7 +1700,7 @@ fn configure_network(shell: &VegaShell, window: &adw::ApplicationWindow, dbus: V
         let page = wifi_page.clone();
         let dbus = wifi_dbus.clone();
         glib::MainContext::default().spawn_local(async move {
-            if !form_dialog(&dialog, "confirm").await {
+            if !confirm_dialog(&dialog, "confirm").await {
                 return;
             }
             let secret = password.text().to_string();
@@ -2647,7 +2647,7 @@ fn configure_snapshots(shell: &VegaShell, dbus: VegaDbus) {
         let page = create_page.clone();
         let client = create_dbus.snapshots();
         glib::MainContext::default().spawn_local(async move {
-            if !form_dialog(&dialog, "create").await {
+            if !required_dialog(&dialog, "create").await {
                 return;
             }
             let description = description.text().trim().to_owned();
@@ -2845,7 +2845,7 @@ fn configure_snapshots(shell: &VegaShell, dbus: VegaDbus) {
             dialog.set_response_appearance("rollback", adw::ResponseAppearance::Destructive);
             dialog.set_default_response(Some("cancel"));
             dialog.set_close_response("cancel");
-            if !form_dialog(&dialog, "rollback").await {
+            if !required_dialog(&dialog, "rollback").await {
                 button.set_sensitive(true);
                 return;
             }
@@ -3021,7 +3021,7 @@ fn configure_backup(shell: &VegaShell, dbus: VegaDbus) {
         let page = create_page.clone();
         let client = create_dbus.backup();
         glib::MainContext::default().spawn_local(async move {
-            if !form_dialog(&dialog, "create").await {
+            if !required_dialog(&dialog, "create").await {
                 return;
             }
             let parsed_paths = paths
@@ -3952,7 +3952,7 @@ async fn confirm_and_trust_repo_key(
     dialog.set_response_appearance("confirm", adw::ResponseAppearance::Suggested);
     dialog.set_default_response(Some("cancel"));
     dialog.set_close_response("cancel");
-    if !confirm_dialog(&dialog, "confirm").await {
+    if !required_dialog(&dialog, "confirm").await {
         return;
     }
 
@@ -4162,25 +4162,31 @@ fn send_notification(title: &str, body: &str, id: &str) {
     }
 }
 
-async fn confirm_dialog(dialog: &adw::AlertDialog, response: &str) -> bool {
-    should_bypass_confirmation(false, crate::preferences::confirmations_enabled())
-        || dialog.clone().choose_future(gtk::Widget::NONE).await == response
-}
-
-fn should_bypass_confirmation(is_form: bool, confirmations_enabled: bool) -> bool {
-    !is_form && !confirmations_enabled
-}
-
-/// Apresenta diálogos que contêm campos ou informações que o usuário precisa
-/// revisar. A preferência de confirmação só pode ignorar a aprovação de uma
-/// ação já preenchida; ela nunca pode pular a coleta desses dados.
-async fn form_dialog(dialog: &adw::AlertDialog, response: &str) -> bool {
+/// Collect input or require a decision on new information (AI proposals,
+/// rollback differences and repository signing keys), regardless of preferences.
+async fn required_dialog(dialog: &adw::AlertDialog, response: &str) -> bool {
     dialog.clone().choose_future(gtk::Widget::NONE).await == response
 }
 
+/// Optional confirmation of an action already specified by the user.
+async fn confirm_dialog(dialog: &adw::AlertDialog, response: &str) -> bool {
+    // An extra child may collect input or contain a required review. In
+    // particular, connecting to protected Wi-Fi adds a password field, while
+    // open networks and disconnection only need an optional confirmation.
+    if dialog.extra_child().is_some() || crate::preferences::confirmations_enabled() {
+        required_dialog(dialog, response).await
+    } else {
+        true
+    }
+}
+
+#[cfg(test)]
+#[path = "dialog_tests.rs"]
+mod dialog_tests;
+
 #[cfg(test)]
 mod tests {
-    use super::{APPLICATION_ID, should_bypass_confirmation, valid_ipv4_cidr};
+    use super::{APPLICATION_ID, valid_ipv4_cidr};
 
     #[test]
     fn production_id_is_stable() {
@@ -4194,12 +4200,5 @@ mod tests {
         assert!(!valid_ipv4_cidr("192.168.1.20"));
         assert!(!valid_ipv4_cidr("192.168.1.20/33"));
         assert!(!valid_ipv4_cidr("not-an-address/24"));
-    }
-
-    #[test]
-    fn disabling_confirmations_only_bypasses_action_approval() {
-        assert!(should_bypass_confirmation(false, false));
-        assert!(!should_bypass_confirmation(false, true));
-        assert!(!should_bypass_confirmation(true, false));
     }
 }

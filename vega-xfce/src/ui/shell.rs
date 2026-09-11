@@ -432,7 +432,7 @@ fn show_preferences(parent: &gtk::Window, preferences: Rc<RefCell<crate::prefere
     let confirmations = adw::SwitchRow::builder()
         .title(gettext("Confirmar ações administrativas"))
         .subtitle(gettext(
-            "Solicitar confirmação antes de alterações no sistema",
+            "Confirmar ações já definidas. Formulários, propostas da IA e revisões de segurança sempre serão exibidos.",
         ))
         .active(preferences.borrow().confirm_actions)
         .build();
